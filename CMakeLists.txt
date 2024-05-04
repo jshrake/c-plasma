@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.26)
 project(CPlasma VERSION 1.0.0 DESCRIPTION "C Plasma")
 
 # Specify the C standard
@@ -24,8 +24,9 @@ add_custom_target(copy_ob_vers_gen_h ALL
     DEPENDS ${DST_FILE}
 )
 
-# Loam
-add_library(loam STATIC
+# Plasma
+add_library(plasma STATIC
+    # loam
     "plasma/libLoam/c/dSFMT.c"
     "plasma/libLoam/c/ob-atomic.c"
     "plasma/libLoam/c/ob-dirs.c"
@@ -42,31 +43,7 @@ add_library(loam STATIC
     "plasma/libLoam/c/ob-truly-rand.c"
     "plasma/libLoam/c/ob-util.c"
     "plasma/libLoam/c/ob-vers.c"
-)
-add_dependencies(loam copy_ob_vers_gen_h)
-set(loam_headers 
-    "plasma/libLoam/c/ob-atomic.h"
-    "plasma/libLoam/c/ob-dirs.h"
-    "plasma/libLoam/c/ob-file.h"
-    "plasma/libLoam/c/ob-hash.h"
-    "plasma/libLoam/c/ob-log.h"
-    "plasma/libLoam/c/ob-math.h"
-    "plasma/libLoam/c/ob-rand.h"
-    "plasma/libLoam/c/ob-retorts.h"
-    "plasma/libLoam/c/ob-string.h"
-    "plasma/libLoam/c/ob-thread.h"
-    "plasma/libLoam/c/ob-time.h"
-    "plasma/libLoam/c/ob-util.h"
-    "plasma/libLoam/c/ob-vers.h"
-)
-set_target_properties(loam PROPERTIES PUBLIC_HEADER "${loam_headers}")
-target_include_directories(loam PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plasma>
-    $<INSTALL_INTERFACE:include>
-)
-
-# Plasma
-add_library(plasma STATIC
+    # plasma
     "plasma/libPlasma/c/eintr-helper.c"
     "plasma/libPlasma/c/fifo_ops.c"
     "plasma/libPlasma/c/nossl.c"
@@ -106,6 +83,26 @@ add_library(plasma STATIC
     "plasma/libPlasma/c/slaw.c"
 )
 set(plasma_headers 
+    # loam
+    "plasma/libLoam/c/ob-api.h"
+    "plasma/libLoam/c/ob-atomic.h"
+    "plasma/libLoam/c/ob-attrs.h"
+    "plasma/libLoam/c/ob-coretypes.h"
+    "plasma/libLoam/c/ob-dirs.h"
+    "plasma/libLoam/c/ob-file.h"
+    "plasma/libLoam/c/ob-hash.h"
+    "plasma/libLoam/c/ob-log.h"
+    "plasma/libLoam/c/ob-math.h"
+    "plasma/libLoam/c/ob-mvtypes.h"
+    "plasma/libLoam/c/ob-rand.h"
+    "plasma/libLoam/c/ob-retorts.h"
+    "plasma/libLoam/c/ob-string.h"
+    "plasma/libLoam/c/ob-thread.h"
+    "plasma/libLoam/c/ob-time.h"
+    "plasma/libLoam/c/ob-types.h"
+    "plasma/libLoam/c/ob-util.h"
+    "plasma/libLoam/c/ob-vers.h"
+    # plasma
     "plasma/libPlasma/c/c-plasma.h"
     "plasma/libPlasma/c/slaw.h"
     "plasma/libPlasma/c/protein.h"
@@ -118,30 +115,30 @@ set(plasma_headers
     "plasma/libPlasma/c/slaw-path.h"
     "plasma/libPlasma/c/slaw-string.h"
     "plasma/libPlasma/c/slaw-walk.h"
+    "plasma/libPlasma/c/plasma-types.h"
+    "plasma/libPlasma/c/plasma-retorts.h"
+    "plasma/libPlasma/c/slaw-numeric-ilk-rumpus.h"
 )
-set_target_properties(plasma PROPERTIES PUBLIC_HEADER "${plasma_headers}")
+target_sources(plasma PUBLIC
+    FILE_SET public_headers
+    TYPE HEADERS
+    BASE_DIRS plasma
+    FILES ${loam_header} ${plasma_headers})
+
+add_dependencies(plasma copy_ob_vers_gen_h)
 target_include_directories(plasma PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plasma>
     $<INSTALL_INTERFACE:include>
 )
-
 target_include_directories(plasma PRIVATE ${YAML_INCLUDE_DIRS})
-target_link_libraries(plasma PRIVATE loam ${YAML_LIBRARIES})
+target_link_libraries(plasma PRIVATE ${YAML_LIBRARIES})
 target_compile_options(plasma PRIVATE ${YAML_CFLAGS_OTHER})
 
-# Installation rules for library, headers, and binaries
-install(TARGETS loam
-    LIBRARY DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/libLoam/c
-)
+# Installation 
 install(TARGETS plasma
     LIBRARY DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/libPlasma/c
+    FILE_SET public_headers
 )
-
-# Configuration for pkg-config file
-configure_file(pkgconfig/loam.pc.in loam.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/loam.pc DESTINATION lib/pkgconfig)
 
 configure_file(pkgconfig/plasma.pc.in plasma.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/plasma.pc DESTINATION lib/pkgconfig)
@@ -150,7 +147,7 @@ install(FILES ${CMAKE_BINARY_DIR}/plasma.pc DESTINATION lib/pkgconfig)
 function(add_bin exe_name source_file)
     add_executable(${exe_name} ${source_file})
     target_include_directories(${exe_name} PRIVATE ${YAML_INCLUDE_DIRS})
-    target_link_libraries(${exe_name} PRIVATE loam plasma ${YAML_LIBRARIES})
+    target_link_libraries(${exe_name} PRIVATE plasma ${YAML_LIBRARIES})
     target_link_directories(${exe_name} PRIVATE ${YAML_LIBRARY_DIRS})
     target_compile_options(${exe_name} PRIVATE ${YAML_CFLAGS_OTHER})
     install(TARGETS ${exe_name} RUNTIME DESTINATION bin)
