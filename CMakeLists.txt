@@ -46,7 +46,6 @@ set(loam_headers
     "plasma/libLoam/c/ob-atomic.h"
     "plasma/libLoam/c/ob-dirs.h"
     "plasma/libLoam/c/ob-file.h"
-    "plasma/libLoam/c/ob-hash-city.h"
     "plasma/libLoam/c/ob-hash.h"
     "plasma/libLoam/c/ob-log.h"
     "plasma/libLoam/c/ob-math.h"
@@ -55,7 +54,6 @@ set(loam_headers
     "plasma/libLoam/c/ob-string.h"
     "plasma/libLoam/c/ob-thread.h"
     "plasma/libLoam/c/ob-time.h"
-    "plasma/libLoam/c/ob-truly-rand.h"
     "plasma/libLoam/c/ob-util.h"
     "plasma/libLoam/c/ob-vers.h"
 )
@@ -139,6 +137,13 @@ install(TARGETS plasma
     PUBLIC_HEADER DESTINATION include/libPlasma/c
 )
 
+# Configuration for pkg-config file
+configure_file(pkgconfig/loam.pc.in loam.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/loam.pc DESTINATION lib/pkgconfig)
+
+configure_file(pkgconfig/plasma.pc.in plasma.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/plasma.pc DESTINATION lib/pkgconfig)
+
 # Binaries
 function(add_bin exe_name source_file)
     add_executable(${exe_name} ${source_file})
@@ -161,7 +166,3 @@ add_bin(p-rename        plasma/libPlasma/c/p-rename.c)
 add_bin(p-resize        plasma/libPlasma/c/p-resize.c)
 add_bin(p-sleep         plasma/libPlasma/c/p-sleep.c)
 add_bin(p-stop          plasma/libPlasma/c/p-stop.c)
-
-# # Configuration for pkg-config file
-# configure_file(my_c_library.pc.in my_c_library.pc @ONLY)
-# install(FILES ${CMAKE_BINARY_DIR}/my_c_library.pc DESTINATION lib/pkgconfig)
