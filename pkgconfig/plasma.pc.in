@@ -6,5 +6,5 @@ includedir=${prefix}/include
 Name: C Plasma
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
-Libs: -L${libdir} -lplasma
+Libs: -L${libdir} -lplasma -lloam -lyaml
 Cflags: -I${includedir}

@@ -5,6 +5,8 @@ project(CPlasma VERSION 1.0.0 DESCRIPTION "C Plasma")
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+option(BUILD_BINS "Build the executables" ON)
+
 # Check dependencies
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAML REQUIRED yaml-0.1) 
@@ -154,6 +156,7 @@ function(add_bin exe_name source_file)
     install(TARGETS ${exe_name} RUNTIME DESTINATION bin)
 endfunction()
 
+if (BUILD_BINS)
 add_bin(pool_tcp_server plasma/libPlasma/c/pool_tcp_server.c)
 add_bin(p-await         plasma/libPlasma/c/p-await.c)
 add_bin(p-create        plasma/libPlasma/c/p-create.c)
@@ -166,3 +169,4 @@ add_bin(p-rename        plasma/libPlasma/c/p-rename.c)
 add_bin(p-resize        plasma/libPlasma/c/p-resize.c)
 add_bin(p-sleep         plasma/libPlasma/c/p-sleep.c)
 add_bin(p-stop          plasma/libPlasma/c/p-stop.c)
+endif()
