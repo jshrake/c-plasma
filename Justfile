@@ -1,11 +1,11 @@
 init:
-    cmake -B build/desktop -GNinja
+    cmake -B build -GNinja
 
 build: init
-    cmake --build build/desktop --config Release
+    cmake --build build --config Release
 
 install: build
-    cmake --install build/desktop  --prefix build/install/desktop
+    cmake --install build --prefix build/install
 
 clean:
     rm -rf build
