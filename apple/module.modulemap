@@ -1,5 +1,5 @@
 framework module Plasma {
-  umbrella header "libPlasma/c/c-plasma.h"
+  umbrella "Headers/libPlasma"
 
   export *
   module * { export * }
