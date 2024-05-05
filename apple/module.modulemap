@@ -1,0 +1,6 @@
+framework module Plasma {
+  umbrella header "libPlasma/c/c-plasma.h"
+
+  export *
+  module * { export * }
+}

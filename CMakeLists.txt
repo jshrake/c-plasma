@@ -82,7 +82,7 @@ add_library(plasma STATIC
     "plasma/libPlasma/c/slaw-yaml.c"
     "plasma/libPlasma/c/slaw.c"
 )
-set(plasma_headers 
+set(loam_headers 
     # loam
     "plasma/libLoam/c/ob-api.h"
     "plasma/libLoam/c/ob-atomic.h"
@@ -102,6 +102,8 @@ set(plasma_headers
     "plasma/libLoam/c/ob-types.h"
     "plasma/libLoam/c/ob-util.h"
     "plasma/libLoam/c/ob-vers.h"
+)
+set(plasma_headers
     # plasma
     "plasma/libPlasma/c/c-plasma.h"
     "plasma/libPlasma/c/slaw.h"
@@ -119,11 +121,15 @@ set(plasma_headers
     "plasma/libPlasma/c/plasma-retorts.h"
     "plasma/libPlasma/c/slaw-numeric-ilk-rumpus.h"
 )
+
+# Create a file_set to copy headers into place, preserving the directory structure
+set(all_headers ${loam_headers} ${plasma_headers})
 target_sources(plasma PUBLIC
     FILE_SET public_headers
     TYPE HEADERS
     BASE_DIRS plasma
-    FILES ${loam_header} ${plasma_headers})
+    FILES ${all_headers}
+)
 
 add_dependencies(plasma copy_ob_vers_gen_h)
 target_include_directories(plasma PUBLIC
@@ -134,14 +140,39 @@ target_include_directories(plasma PRIVATE ${YAML_INCLUDE_DIRS})
 target_link_libraries(plasma PRIVATE ${YAML_LIBRARIES})
 target_compile_options(plasma PRIVATE ${YAML_CFLAGS_OTHER})
 
+# Framework
+if(CMAKE_GENERATOR STREQUAL Xcode)
+set_target_properties(plasma PROPERTIES
+    FRAMEWORK TRUE
+    FRAMEWORK_VERSION A
+    MACOSX_FRAMEWORK_IDENTIFIER com.plasma
+    MACOSX_FRAMEWORK_INFO_PLIST "${CMAKE_SOURCE_DIR}/apple/Info.plist.in"
+    VERSION 1.0.0
+    SOVERSION 1.0.0
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Apple Development"
+)
+
+foreach(header ${loam_headers})
+    set_source_files_properties(${header} PROPERTIES MACOSX_PACKAGE_LOCATION Headers/libLoam/c)
+endforeach()
+foreach(header ${plasma_headers})
+    set_source_files_properties(${header} PROPERTIES MACOSX_PACKAGE_LOCATION Headers/libPlasma/c)
+endforeach()
+install(FILES ${CMAKE_SOURCE_DIR}/apple/module.modulemap DESTINATION Library/Frameworks/plasma.framework/Modules)
+endif()
+
+
 # Installation 
 install(TARGETS plasma
     LIBRARY DESTINATION lib
     FILE_SET public_headers
+    FRAMEWORK DESTINATION Library/Frameworks
 )
 
+# Pkg-config
 configure_file(pkgconfig/plasma.pc.in plasma.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/plasma.pc DESTINATION lib/pkgconfig)
+
 
 # Binaries
 function(add_bin exe_name source_file)
