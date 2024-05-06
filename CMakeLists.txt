@@ -78,7 +78,6 @@ add_library(plasma STATIC
     "plasma/libPlasma/c/slaw-string.c"
     "plasma/libPlasma/c/slaw-v1.c"
     "plasma/libPlasma/c/slaw-walk.c"
-    "plasma/libPlasma/c/slaw-yaml-stub.c"
     "plasma/libPlasma/c/slaw-yaml.c"
     "plasma/libPlasma/c/slaw.c"
 )
