@@ -6,10 +6,13 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 option(BUILD_BINS "Build the executables" ON)
+option(YAML_SUPPORT "Build with YAML support" ON)
 
 # Check dependencies
+if (YAML_SUPPORT)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(YAML REQUIRED yaml-0.1) 
+endif()
 
 # Copy ob-vers-gen.h into place
 set(SRC_FILE ${CMAKE_SOURCE_DIR}/generated/ob-vers-gen.h)
@@ -25,7 +28,7 @@ add_custom_target(copy_ob_vers_gen_h ALL
 )
 
 # Plasma
-add_library(plasma STATIC
+set(plasma_source
     # loam
     "plasma/libLoam/c/dSFMT.c"
     "plasma/libLoam/c/ob-atomic.c"
@@ -78,9 +81,15 @@ add_library(plasma STATIC
     "plasma/libPlasma/c/slaw-string.c"
     "plasma/libPlasma/c/slaw-v1.c"
     "plasma/libPlasma/c/slaw-walk.c"
-    "plasma/libPlasma/c/slaw-yaml.c"
     "plasma/libPlasma/c/slaw.c"
 )
+
+if (YAML_SUPPORT)
+list(APPEND plasma_source "plasma/libPlasma/c/slaw-yaml.c")
+else()
+list(APPEND plasma_source "plasma/libPlasma/c/slaw-yaml-stub.c")
+endif()
+
 set(loam_headers 
     # loam
     "plasma/libLoam/c/ob-api.h"
@@ -122,12 +131,12 @@ set(plasma_headers
 )
 
 # Create a file_set to copy headers into place, preserving the directory structure
-set(all_headers ${loam_headers} ${plasma_headers})
+add_library(plasma STATIC ${plasma_source})
 target_sources(plasma PUBLIC
     FILE_SET public_headers
     TYPE HEADERS
     BASE_DIRS plasma
-    FILES ${all_headers}
+    FILES ${plasma_headers} ${loam_headers}
 )
 
 add_dependencies(plasma copy_ob_vers_gen_h)
@@ -135,9 +144,11 @@ target_include_directories(plasma PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plasma>
     $<INSTALL_INTERFACE:include>
 )
+if (YAML_SUPPORT)
 target_include_directories(plasma PRIVATE ${YAML_INCLUDE_DIRS})
 target_link_libraries(plasma PRIVATE ${YAML_LIBRARIES})
 target_compile_options(plasma PRIVATE ${YAML_CFLAGS_OTHER})
+endif()
 
 # Framework
 if(CMAKE_GENERATOR STREQUAL Xcode)
@@ -176,10 +187,12 @@ install(FILES ${CMAKE_BINARY_DIR}/plasma.pc DESTINATION lib/pkgconfig)
 # Binaries
 function(add_bin exe_name source_file)
     add_executable(${exe_name} ${source_file})
+    if (YAML_SUPPORT)
     target_include_directories(${exe_name} PRIVATE ${YAML_INCLUDE_DIRS})
-    target_link_libraries(${exe_name} PRIVATE plasma ${YAML_LIBRARIES})
     target_link_directories(${exe_name} PRIVATE ${YAML_LIBRARY_DIRS})
+    target_link_libraries(${exe_name} PRIVATE plasma ${YAML_LIBRARIES})
     target_compile_options(${exe_name} PRIVATE ${YAML_CFLAGS_OTHER})
+    endif()
     install(TARGETS ${exe_name} RUNTIME DESTINATION bin)
 endfunction()
 
