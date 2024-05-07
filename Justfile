@@ -31,7 +31,7 @@ xcframework: macos ios ios-sim
     rm -rf build/install/xcframework
     mkdir -p build/install/xcframework
     xcodebuild -create-xcframework \
-        -framework build/install/macos/Library/Frameworks/plasma.framework \
-        -framework build/install/ios/Library/Frameworks/plasma.framework \
-        -framework build/install/ios-sim/Library/Frameworks/plasma.framework \
+        -library build/install/macos/lib/libplasma.a -headers build/install/macos/include \
+        -library build/install/ios/lib/libplasma.a -headers build/install/ios/include \
+        -library build/install/ios-sim/lib/libplasma.a -headers build/install/ios-sim/include \
         -output build/install/xcframework/plasma.xcframework

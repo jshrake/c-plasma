@@ -139,6 +139,7 @@ target_sources(plasma PUBLIC
     FILES ${plasma_headers} ${loam_headers}
 )
 
+
 add_dependencies(plasma copy_ob_vers_gen_h)
 target_include_directories(plasma PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plasma>
@@ -150,34 +151,13 @@ target_link_libraries(plasma PRIVATE ${YAML_LIBRARIES})
 target_compile_options(plasma PRIVATE ${YAML_CFLAGS_OTHER})
 endif()
 
-# Framework
-if(CMAKE_GENERATOR STREQUAL Xcode)
-set_target_properties(plasma PROPERTIES
-    FRAMEWORK TRUE
-    FRAMEWORK_VERSION A
-    MACOSX_FRAMEWORK_IDENTIFIER com.plasma
-    MACOSX_FRAMEWORK_INFO_PLIST "${CMAKE_SOURCE_DIR}/apple/Info.plist.in"
-    VERSION 1.0.0
-    SOVERSION 1.0.0
-    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Apple Development"
-)
-
-foreach(header ${loam_headers})
-    set_source_files_properties(${header} PROPERTIES MACOSX_PACKAGE_LOCATION Headers/libLoam/c)
-endforeach()
-foreach(header ${plasma_headers})
-    set_source_files_properties(${header} PROPERTIES MACOSX_PACKAGE_LOCATION Headers/libPlasma/c)
-endforeach()
-install(FILES ${CMAKE_SOURCE_DIR}/apple/module.modulemap DESTINATION Library/Frameworks/plasma.framework/Modules)
-endif()
-
 
 # Installation 
 install(TARGETS plasma
     LIBRARY DESTINATION lib
     FILE_SET public_headers
-    FRAMEWORK DESTINATION Library/Frameworks
 )
+install(FILES ${CMAKE_SOURCE_DIR}/apple/module.modulemap DESTINATION include)
 
 # Pkg-config
 configure_file(pkgconfig/plasma.pc.in plasma.pc @ONLY)
