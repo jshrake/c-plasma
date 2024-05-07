@@ -5,6 +5,10 @@ project(CPlasma VERSION 1.0.0 DESCRIPTION "C Plasma")
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+set(CMAKE_INSTALL_BINDIR bin)
+set(CMAKE_INSTALL_LIBDIR lib)
+set(CMAKE_INSTALL_INCLUDEDIR include)
+
 option(BUILD_BINS "Build the executables" ON)
 option(YAML_SUPPORT "Build with YAML support" ON)
 
@@ -141,10 +145,6 @@ target_sources(plasma PUBLIC
 
 
 add_dependencies(plasma copy_ob_vers_gen_h)
-target_include_directories(plasma PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/plasma>
-    $<INSTALL_INTERFACE:include>
-)
 if (YAML_SUPPORT)
 target_include_directories(plasma PRIVATE ${YAML_INCLUDE_DIRS})
 target_link_libraries(plasma PRIVATE ${YAML_LIBRARIES})
