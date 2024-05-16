@@ -1,0 +1,45 @@
+name: windows
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    # Windows is not supported yet
+    if: false
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' --yes
+          choco install ninja --yes
+          choco install pkgconfiglite --yes
+
+      - name: Build
+        run: |
+          cmake -B build -GNinja -DYAML_SUPPORT=OFF -DBUILD_BINS=OFF
+          cmake --build build --config Release
+          cmake --install build --prefix build/install
+
+      - name: Compress Install Directory
+        run: |
+          Compress-Archive -Path build/install -DestinationPath build/plasma_windows_x86-64_release.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plasma_windows_x86-64_release
+          path: build/plasma_windows_x86-64_release.zip

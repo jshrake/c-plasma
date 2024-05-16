@@ -94,6 +94,10 @@ else()
 list(APPEND plasma_source "plasma/libPlasma/c/slaw-yaml-stub.c")
 endif()
 
+if (WIN32)
+list(APPEND plasma_source "plasma/libLoam/c/win32/ob-sys-win32.c")
+endif()
+
 set(loam_headers 
     # loam
     "plasma/libLoam/c/ob-api.h"
@@ -134,8 +138,12 @@ set(plasma_headers
     "plasma/libPlasma/c/slaw-numeric-ilk-rumpus.h"
 )
 
-# Create a file_set to copy headers into place, preserving the directory structure
+
 add_library(plasma STATIC ${plasma_source})
+add_dependencies(plasma copy_ob_vers_gen_h)
+target_include_directories(plasma PUBLIC ${CMAKE_CURRENT_LIST_DIR}/plasma)
+
+# Create a file_set to copy headers into place, preserving the directory structure
 target_sources(plasma PUBLIC
     FILE_SET public_headers
     TYPE HEADERS
@@ -143,12 +151,18 @@ target_sources(plasma PUBLIC
     FILES ${plasma_headers} ${loam_headers}
 )
 
+if(UNIX AND NOT APPLE)
+    find_library(MATH_LIB m)
+    find_library(RT_LIB rt)
+    find_library(DL_LIB dl)
+    find_library(PTHREAD_LIB pthread)
+    target_link_libraries(plasma PRIVATE ${MATH_LIB} ${RT_LIB} ${DL_LIB} ${PTHREAD_LIB})
+endif()
 
-add_dependencies(plasma copy_ob_vers_gen_h)
 if (YAML_SUPPORT)
-target_include_directories(plasma PRIVATE ${YAML_INCLUDE_DIRS})
-target_link_libraries(plasma PRIVATE ${YAML_LIBRARIES})
-target_compile_options(plasma PRIVATE ${YAML_CFLAGS_OTHER})
+    target_include_directories(plasma PRIVATE ${YAML_INCLUDE_DIRS})
+    target_link_libraries(plasma PRIVATE ${YAML_LIBRARIES})
+    target_compile_options(plasma PRIVATE ${YAML_CFLAGS_OTHER})
 endif()
 
 
@@ -167,6 +181,7 @@ install(FILES ${CMAKE_BINARY_DIR}/plasma.pc DESTINATION lib/pkgconfig)
 # Binaries
 function(add_bin exe_name source_file)
     add_executable(${exe_name} ${source_file})
+    target_include_directories(${exe_name} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/plasma)
     if (YAML_SUPPORT)
     target_include_directories(${exe_name} PRIVATE ${YAML_INCLUDE_DIRS})
     target_link_directories(${exe_name} PRIVATE ${YAML_LIBRARY_DIRS})
