@@ -24,4 +24,5 @@ jobs:
           name: ${{ github.ref_name }}
           draft: true
           makeLatest: true
-          artifacts: ./artifacts/**/*.tar.gz
+          artifacts: ./artifacts/**/*.zip
+          artifactContentType: application/zip

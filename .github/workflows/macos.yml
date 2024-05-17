@@ -25,10 +25,10 @@ jobs:
           cmake --install build --prefix build/install
 
       - name: Compress Install Directory
-        run: tar -czvf build/plasma_macos_arm64_release.tar.gz -C build/install .
+        run: zip -r build/plasma_macos_arm64_release.zip build/install
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: plasma_macos_arm64_release
-          path: build/plasma_macos_arm64_release.tar.gz
+          path: build/plasma_macos_arm64_release.zip

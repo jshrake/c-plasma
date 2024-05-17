@@ -35,10 +35,10 @@ jobs:
               -output build/install/xcframework/plasma.xcframework
 
       - name: Compress Install Directory
-        run: tar -czvf build/plasma_xcframework_release.tar.gz -C build/install/xcframework .
+        run: zip -r build/plasma_xcframework_release.zip build/install/xcframework
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: plasma_xcframework_release
-          path: build/plasma_xcframework_release.tar.gz
+          path: build/plasma_xcframework_release.zip
