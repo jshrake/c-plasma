@@ -9,7 +9,6 @@ Unified* builds of C [libPlasma](https://github.com/zeugma-hamper/plasma/) and a
 | xcframework       |    ✅     |     ❌     |   ❌  |
 | emscripten        |    ✅     |     ❌     |   ❌   |
 | windows (x86-64)  |    ❌     |     ❌    |   ❌   |
-| | | | |
 
 \* Unified means that libLoam and libPlasma are built together in a single static library.
 
