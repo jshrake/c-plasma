@@ -19,9 +19,11 @@ jobs:
     uses: ./.github/workflows/windows.yml
   xcframework:
     uses: ./.github/workflows/xcframework.yml
+  emscripten:
+    uses: ./.github/workflows/emscripten.yml
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [macos, linux, xcframework]
+    needs: [macos, linux, xcframework, emscripten]
     uses: ./.github/workflows/release.yml
     permissions:
       contents: write

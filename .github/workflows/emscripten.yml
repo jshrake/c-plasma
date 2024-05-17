@@ -1,0 +1,35 @@
+name: emscripten
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: mymindstorm/setup-emsdk@v14
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
+
+      - name: Build
+        run: |
+          emcmake cmake -B build/emscripten -DBUILD_BINS=OFF -DYAML_SUPPORT=OFF
+          cmake --build build/emscripten --config Debug
+          cmake --install build/emscripten  --prefix build/install/emscripten
+
+      - name: Compress Install Directory
+        run: zip -r build/plasma_emscripten_release.zip build/install/emscripten
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plasma_emscripten_release
+          path: build/plasma_emscripten_release.zip

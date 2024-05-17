@@ -54,7 +54,6 @@ set(plasma_source
     "plasma/libPlasma/c/eintr-helper.c"
     "plasma/libPlasma/c/fifo_ops.c"
     "plasma/libPlasma/c/nossl.c"
-    "plasma/libPlasma/c/ob-lsfd.c"
     "plasma/libPlasma/c/plasma-util.c"
     "plasma/libPlasma/c/pool_cmd.c"
     "plasma/libPlasma/c/pool_mmap.c"
@@ -152,11 +151,7 @@ target_sources(plasma PUBLIC
 )
 
 if(UNIX AND NOT APPLE)
-    find_library(MATH_LIB m)
-    find_library(RT_LIB rt)
-    find_library(DL_LIB dl)
-    find_library(PTHREAD_LIB pthread)
-    target_link_libraries(plasma PRIVATE ${MATH_LIB} ${RT_LIB} ${DL_LIB} ${PTHREAD_LIB})
+    target_link_libraries(plasma PRIVATE m rt dl pthread)
 endif()
 
 if (YAML_SUPPORT)
