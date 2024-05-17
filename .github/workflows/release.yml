@@ -23,6 +23,5 @@ jobs:
         with:
           name: ${{ github.ref_name }}
           draft: true
-          allowUpdates: true
           makeLatest: true
-          artifacts: ./artifacts/*
+          artifacts: ./artifacts/**/*.tar.gz
