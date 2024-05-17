@@ -13,11 +13,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install dependencies
-        run: |
-          brew update
-          brew install cmake
-
       - name: Build
         run: |
           cmake -B build/macos -G Xcode -DCMAKE_TOOLCHAIN_FILE=cmake/ios-cmake/ios.toolchain.cmake -DPLATFORM=MAC_UNIVERSAL -DBUILD_BINS=OFF -DYAML_SUPPORT=ON
