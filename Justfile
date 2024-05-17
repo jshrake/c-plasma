@@ -10,6 +10,12 @@ install: build
 clean:
     rm -rf build
 
+emscripten:
+    emcmake cmake -B build/emscripten -DBUILD_BINS=OFF -DYAML_SUPPORT=OFF
+    cmake --build build/emscripten --config Debug
+    cmake --install build/emscripten  --prefix build/install/emscripten
+    emcc emscripten/test.c -g -I./build/install/emscripten/include -L./build/install/emscripten/lib -lplasma -o build/test.html
+
 xcframework: macos ios ios-sim
     rm -rf build/install/xcframework
     mkdir -p build/install/xcframework
