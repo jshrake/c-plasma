@@ -1,0 +1,27 @@
+name: main
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  macos:
+    uses: ./.github/workflows/macos.yml
+  linux:
+    uses: ./.github/workflows/linux.yml
+  windows:
+    uses: ./.github/workflows/windows.yml
+  xcframework:
+    uses: ./.github/workflows/xcframework.yml
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [macos, linux, xcframework]
+    uses: ./.github/workflows/release.yml
+    permissions:
+      contents: write
