@@ -7,7 +7,6 @@ Pre-built static libraries of C [plasma](https://github.com/zeugma-hamper/plasma
 | linux (x86-64)    |    ✅     |     ✅     |   ✅  |
 | macos (arm64)     |    ✅     |     ✅     |   ✅  |
 | ios               |    ✅     |     ❌     |   ❌  |
-| emscripten        |    ✅     |     ❌     |   ❌  |
 | windows (x86-64)  |    ❌     |     ❌     |   ❌  |
 
 The goal of this repo is to make it easy to build language-specific bindings for plasma across multiple platforms by combining C libLoam and libPlasma into a single pre-built static library.
